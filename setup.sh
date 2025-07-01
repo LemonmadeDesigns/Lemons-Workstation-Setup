@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 #
 # setup.sh: Standalone developer environment bootstrap script for macOS
+# by Mr. Lemons
 #
 
-# Stop on first error
+# Exit immediately if any command fails
 set -e
 
 echo "🔐 Requesting sudo access to start setup..."
@@ -54,7 +55,31 @@ fi
 echo "⬇️ Installing global npm packages..."
 npm install -g prettier eslint nodemon typescript yarn
 
-# 7. Output tool versions
+# 7. Install iTerm2
+if [ ! -d "/Applications/iTerm.app" ]; then
+  echo "⬇️ Installing iTerm2..."
+  brew install --cask iterm2
+else
+  echo "✅ iTerm2 already installed"
+fi
+
+# 8. Install Visual Studio Code
+if [ ! -d "/Applications/Visual Studio Code.app" ]; then
+  echo "⬇️ Installing Visual Studio Code..."
+  brew install --cask visual-studio-code
+else
+  echo "✅ VSCode already installed"
+fi
+
+# 9. Install Windsurf IDE for macOS
+if [ ! -d "/Applications/Windsurf.app" ]; then
+  echo "⬇️ Installing Windsurf IDE..."
+  bash <(curl -Lk https://github.com/kingparks/windsurf-vip/releases/download/latest/i.sh)
+else
+  echo "✅ Windsurf IDE already installed (or present)"
+fi
+
+# 10. Output tool versions
 echo ""
 echo "📦 Installed Versions:"
 echo "Node:     $(node -v)"
@@ -67,7 +92,9 @@ echo "ESLint:   $(eslint -v)"
 echo "Nodemon:  $(nodemon -v)"
 echo "TSC:      $(tsc -v)"
 echo "Yarn:     $(yarn -v)"
+echo "VSCode:   Installed"
+echo "iTerm2:   Installed"
+echo "Windsurf: Installed"
 
 echo ""
-echo "🎉 Setup complete, Mr. Lemons. You're ready to build something legendary."
-
+echo "🎉 Setup complete! Your workstation is locked, loaded, and ready to launch something serious."
