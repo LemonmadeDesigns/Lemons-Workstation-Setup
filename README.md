@@ -40,6 +40,7 @@ Before you run the setup:
 - Install the [Command Line Tools for Xcode](https://developer.apple.com/download/all/?q=Command%20Line%20Tools%20for%20Xcode)
 
 You can install them via terminal if needed:
+
 ```bash
 xcode-select --install
 ```
@@ -70,9 +71,9 @@ chmod +x setup.sh
 
 This script will:
 
-* Ask for your password one time (via `sudo`)
-* Check for Homebrew and install it if needed
-* Install Node.js, MongoDB, mongosh, and developer CLI tools
+- Ask for your password one time (via `sudo`)
+- Check for Homebrew and install it if needed
+- Install Node.js, MongoDB, mongosh, and developer CLI tools
 
 **Note:** This script is standalone — no dependencies on other shell scripts, folders, or config files.
 
@@ -80,23 +81,23 @@ This script will:
 
 ## 🧰 What Gets Installed
 
-### Core Tools:
+### Core Tools
 
-* **Node.js** (includes `npm` and `npx`)
-* **MongoDB Community Edition**
-* **mongosh** – official MongoDB shell
+- **Node.js** (includes `npm` and `npx`)
+- **MongoDB Community Edition**
+- **mongosh** – official MongoDB shell
 
-### Global npm packages:
+### Global npm packages
 
-* `prettier`
-* `eslint`
-* `nodemon`
-* `typescript`
-* `yarn`
+- `prettier`
+- `eslint`
+- `nodemon`
+- `typescript`
+- `yarn`
 
-### Services:
+### Services
 
-* MongoDB is started as a background service with `brew services`
+- MongoDB is started as a background service with `brew services`
 
 All versions of installed tools are displayed at the end of the script.
 
@@ -104,15 +105,15 @@ All versions of installed tools are displayed at the end of the script.
 
 ## 🧠 Tips & Gotchas
 
-* Don’t run with `sudo` — the script handles privilege escalation for you.
+- Don’t run with `sudo` — the script handles privilege escalation for you.
 
-* If you see a lock error with Homebrew:
+- If you see a lock error with Homebrew:
 
   ```bash
   sudo chown -R $(whoami) /usr/local/var/homebrew
   ```
 
-* If `code` doesn’t work in terminal, open VS Code and run:
+- If `code` doesn’t work in terminal, open VS Code and run:
 
   > `Shell Command: Install 'code' command in PATH`
 
@@ -152,4 +153,3 @@ Software Engineer | Release Coordinator | Remote Instruction Manager
 ## ⚖️ License
 
 This project is licensed under the MIT License. Use it, fork it, remix it — just don’t make it worse.
-# Lemons-Workstation-Setup
