@@ -54,7 +54,7 @@ Open Terminal and run:
 ```bash
 mkdir -p ~/workspace &&
 cd ~/workspace &&
-git clone https://github.com/your-username/workstation-setup.git &&
+git clone https://github.com/LemonmadeDesigns/Lemons-Workstation-Setup.git &&
 cd workstation-setup
 ```
 
