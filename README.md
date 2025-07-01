@@ -1,51 +1,39 @@
-# Workstation Setup for Developers
+# 💻 Workstation Setup for Developers
 
-This project provides a streamlined, standalone setup script (`setup.sh`) that automates the essential tools and configurations needed to prepare a macOS machine for full-stack JavaScript and Node.js development. It’s powered by [Bash](https://www.gnu.org/software/bash/) and leverages [Homebrew](https://brew.sh/) to handle all package installations cleanly and efficiently.
-
----
+This project provides a streamlined, standalone setup script (`setup.sh`) to automate the installation of essential tools and configurations for macOS-based full-stack JavaScript and Node.js development. It’s powered by [Bash](https://www.gnu.org/software/bash/) and leverages [Homebrew](https://brew.sh/) to install packages cleanly and efficiently — with added support for modern IDEs like **iTerm2**, **VSCode**, and **Windsurf**.
 
 ## 🎯 Purpose
 
-The goal of this script is to make it fast and consistent to set up a new development machine — whether you’re just getting started or rebuilding from scratch. It installs only what’s necessary for most JavaScript, Node.js, and MongoDB-based workflows.
-
-This is especially useful for individuals or teams who need a repeatable process without reinventing the wheel every time.
-
----
+The goal of this script is to make spinning up a reliable and consistent dev environment quick — whether you're setting up a new Mac, rebuilding your workstation, or onboarding new devs to your team. This script handles the boring stuff so you can jump straight into building.
 
 ## 💡 Why This Format?
 
-- Bash is native, editable, and flexible — no fancy wrappers
-- Everything is in one file — easy to fork, modify, and reuse
-- It keeps the setup minimal while covering the core developer needs
-- No extra dependencies — just `bash`, `git`, and `macOS`
-- Perfect for solo developers, instructors, or team leads building onboarding docs
-
----
+* 🧠 **Simple & native**: No framework, no YAML — just pure bash
+* 📂 **One file, one command**: Easy to fork, reuse, and extend
+* 🧹 **Clean and lightweight**: Only installs what's commonly needed
+* 🧩 **Modular**: Customize it to fit your workflow
+* 👥 **Ideal for individuals and team leads**: Especially helpful when onboarding new engineers or students
 
 ## 🚫 What This Doesn’t Do
 
-This script keeps things lean on purpose:
+This script stays lean on purpose:
 
-- It doesn’t try to install every possible library or language — only general-purpose tools
-- It avoids custom dotfile or terminal configurations
-- It doesn’t enforce IDE or terminal preferences — you decide how deep you want to customize
-
----
+* Doesn’t install every dev stack under the sun — focuses on JavaScript/Mongo
+* Doesn’t mess with dotfiles or personal terminal themes
+* Doesn’t assume your editor of choice — installs multiple IDEs, you pick your weapon
 
 ## ⚙️ Prerequisites
 
-Before you run the setup:
+Before running the setup, make sure:
 
-- Ensure you’re on the latest version of **macOS** or close to it
-- Install the [Command Line Tools for Xcode](https://developer.apple.com/download/all/?q=Command%20Line%20Tools%20for%20Xcode)
+* You’re on an up-to-date version of **macOS**
+* You’ve installed the **Command Line Tools for Xcode** (required for Homebrew)
 
-You can install them via terminal if needed:
+Install with:
 
 ```bash
 xcode-select --install
 ```
-
----
 
 ## 📥 Cloning This Repo
 
@@ -55,14 +43,12 @@ Open Terminal and run:
 mkdir -p ~/workspace &&
 cd ~/workspace &&
 git clone https://github.com/LemonmadeDesigns/Lemons-Workstation-Setup.git &&
-cd workstation-setup
+cd Lemons-Workstation-Setup
 ```
-
----
 
 ## 🧪 Running the Script
 
-To begin installing your dev tools, simply run:
+To install your full dev environment, run:
 
 ```bash
 chmod +x setup.sh
@@ -71,85 +57,80 @@ chmod +x setup.sh
 
 This script will:
 
-- Ask for your password one time (via `sudo`)
-- Check for Homebrew and install it if needed
-- Install Node.js, MongoDB, mongosh, and developer CLI tools
+* Prompt for your Mac password once (via `sudo`)
+* Install Homebrew if missing
+* Install Node.js, MongoDB, `mongosh`, global CLI tools, and 3 IDEs
 
-**Note:** This script is standalone — no dependencies on other shell scripts, folders, or config files.
-
----
+> **Note:** The script is completely standalone. No external configs or linked scripts are required.
 
 ## 🧰 What Gets Installed
 
-### Core Tools
+### 🧱 Core Tooling
 
-- **Node.js** (includes `npm` and `npx`)
-- **MongoDB Community Edition**
-- **mongosh** – official MongoDB shell
+* **Node.js** (includes `npm` and `npx`)
+* **MongoDB Community Edition**
+* **mongosh** (MongoDB’s official shell)
 
-### Global npm packages
+### 📦 Global npm packages
 
-- `prettier`
-- `eslint`
-- `nodemon`
-- `typescript`
-- `yarn`
+* `prettier`
+* `eslint`
+* `nodemon`
+* `typescript`
+* `yarn`
 
-### Services
+### 🛠 Developer IDEs & Tools
 
-- MongoDB is started as a background service with `brew services`
+* **iTerm2** – better terminal for power users
+* **Visual Studio Code** – the default full-stack editor
+* **Windsurf IDE** – installed via official GitHub release script
 
-All versions of installed tools are displayed at the end of the script.
+> ✅ These are installed via Homebrew Casks and secure curl-based installers.
 
----
+### 🔄 Services
+
+* MongoDB is installed and launched as a background service using `brew services`
 
 ## 🧠 Tips & Gotchas
 
-- Don’t run with `sudo` — the script handles privilege escalation for you.
+* No need to run this with `sudo`. The script handles elevation as needed.
 
-- If you see a lock error with Homebrew:
+* If Homebrew throws a permissions error, run:
 
   ```bash
   sudo chown -R $(whoami) /usr/local/var/homebrew
   ```
 
-- If `code` doesn’t work in terminal, open VS Code and run:
+* After installing VS Code, make sure to enable the command line tool:
 
-  > `Shell Command: Install 'code' command in PATH`
-
----
+    > Launch VS Code → Press Cmd+Shift+P → Type: Shell Command → Click Install 'code' command in PATH
 
 ## 🛠 Customization
 
-Want to customize it for your own workflow?
+Want to add Docker, Python, or your favorite fonts?
 
 1. Fork this repo
-2. Modify `setup.sh` to add tools you care about (like `docker`, `python`, or `nvm`)
-3. Share with your team — or just keep it in your own backup playbook
+2. Modify `setup.sh` — it’s well-commented and modular
+3. Use it for new machines, remote onboarding, or team training
 
----
-
-## ❓ FAQs
+## ❓ Frequently Asked Questions
 
 **Q: Can I run the script more than once?**
-A: Yes. It won’t reinstall packages if Homebrew already has them cached. But it may overwrite configs or start services again.
+**A:** Yes. It won’t reinstall what's already there. It’s safe to re-run.
 
-**Q: What if I want to install more tools later?**
-A: You can add them directly to `setup.sh`, or manually with `brew install` or `npm install -g`.
+**Q: Can I modify it to install different stacks (like Python or Ruby)?**
+**A:** Absolutely. Just `brew install` or `npm install -g` anything else you need.
 
-**Q: Can I make this script run on Linux?**
-A: With slight tweaks, yes — though this version is optimized for macOS and Homebrew.
-
----
+**Q: Does it work on Linux or Windows?**
+**A:** Not as-is. This version is built specifically for macOS. A Linux version would need different package managers (`apt`, `dnf`, etc.).
 
 ## ✍️ Author
 
-Built by [Terrell D. Lemons](https://linkedin.com/in/terrelldlemons),
+**Built by [Terrell D. Lemons](https://linkedin.com/in/terrelldlemons)**
 Software Engineer | Release Coordinator | Remote Instruction Manager
-[@terrelldlemons on GitHub](https://github.com/terrelldlemons)
-
----
+[GitHub @terrelldlemons](https://github.com/LemonmadeDesigns/)
 
 ## ⚖️ License
 
-This project is licensed under the MIT License. Use it, fork it, remix it — just don’t make it worse.
+Licensed under the MIT License.
+Use it. Fork it. Share it. Just don’t bloat it.
