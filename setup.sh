@@ -1,82 +1,74 @@
 #!/usr/bin/env bash
 #
-# setup.sh: Standalone developer environment bootstrap script for macOS
-# by Mr. Lemons (Updated)
+# setup.sh: Full macOS Developer Environment Bootstrap
+# by Mr. Lemons (Production Ready)
 #
 
-# Exit immediately if any command fails
 set -e
 
-echo "🔐 Requesting sudo access to start setup..."
+echo "🔐 Requesting sudo access..."
 sudo -K
 sudo true
 clear
 
-echo "🚀 Starting setup for your macOS development workstation..."
+echo "🚀 Starting full macOS developer setup..."
 
 # --------------------------------------------------
-# 0. Ensure Xcode Command Line Tools are installed
+# 0. Xcode Command Line Tools
 # --------------------------------------------------
-# Required for git, compilers, and Homebrew
 if ! xcode-select -p &>/dev/null; then
   echo "⬇️ Installing Xcode Command Line Tools..."
   xcode-select --install
-  echo "⚠️ Please complete the installation, then re-run this script."
+  echo "⚠️ Complete installation, then re-run this script."
   exit 1
 else
-  echo "✅ Xcode Command Line Tools already installed"
+  echo "✅ Xcode CLI Tools installed"
 fi
 
 # --------------------------------------------------
-# 1. Install Homebrew if not already installed
+# 1. Homebrew Installation
 # --------------------------------------------------
 if ! command -v brew &>/dev/null; then
   echo "🍺 Installing Homebrew..."
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
-# --------------------------------------------------
-# 1.1 Add Homebrew to PATH (Apple Silicon + Intel safe)
-# --------------------------------------------------
-# Ensures brew works immediately after install
+# Ensure brew works (Intel + Apple Silicon)
 eval "$(/opt/homebrew/bin/brew shellenv 2>/dev/null || /usr/local/bin/brew shellenv)"
 
 echo "✅ Homebrew ready"
-
-# --------------------------------------------------
-# 2. Update Homebrew
-# --------------------------------------------------
 brew update
 
 # --------------------------------------------------
-# 3. Install NVM (better than raw Node install)
+# 2. Install Core Packages
+# --------------------------------------------------
+brew install git curl wget
+
+# --------------------------------------------------
+# 3. NVM + Node (LTS)
 # --------------------------------------------------
 if [ ! -d "$HOME/.nvm" ]; then
-  echo "⬇️ Installing NVM (Node Version Manager)..."
+  echo "⬇️ Installing NVM..."
   brew install nvm
   mkdir -p ~/.nvm
-else
-  echo "✅ NVM already installed"
 fi
 
-# Load NVM into current shell
 export NVM_DIR="$HOME/.nvm"
 source "$(brew --prefix nvm)/nvm.sh"
 
-# Install latest LTS Node
 if ! command -v node &>/dev/null; then
-  echo "⬇️ Installing Node.js (LTS)..."
+  echo "⬇️ Installing Node LTS..."
   nvm install --lts
   nvm use --lts
 else
-  echo "✅ Node already installed: $(node -v)"
+  echo "✅ Node installed: $(node -v)"
 fi
 
 # --------------------------------------------------
-# 4. Install MongoDB Community Edition
+# 4. MongoDB
 # --------------------------------------------------
 if ! command -v mongod &>/dev/null; then
-  echo "⬇️ Installing MongoDB Community..."
+  echo "⬇️ Installing MongoDB..."
   brew tap mongodb/brew
   brew install mongodb-community@7.0
   brew services start mongodb/brew/mongodb-community@7.0
@@ -85,72 +77,132 @@ else
 fi
 
 # --------------------------------------------------
-# 5. Install mongosh
+# 5. mongosh
 # --------------------------------------------------
 if ! command -v mongosh &>/dev/null; then
   echo "⬇️ Installing mongosh..."
   brew install mongosh
-else
-  echo "✅ mongosh already installed"
 fi
 
 # --------------------------------------------------
-# 6. Install global dev tools (safe mode)
+# 6. Global npm tools (safe path)
 # --------------------------------------------------
-echo "⬇️ Installing global npm packages..."
+echo "⬇️ Installing global npm tools..."
 
-# Avoid permission issues by ensuring npm uses user directory
+mkdir -p ~/.npm-global
 npm config set prefix "${HOME}/.npm-global"
-export PATH="${HOME}/.npm-global/bin:$PATH"
+export PATH="$HOME/.npm-global/bin:$PATH"
 
 npm install -g \
   prettier \
   eslint \
   nodemon \
   typescript \
-  yarn
+  yarn \
+  firebase-tools
 
 # --------------------------------------------------
-# 7. Install iTerm2
+# 7. Docker
+# --------------------------------------------------
+if [ ! -d "/Applications/Docker.app" ]; then
+  echo "⬇️ Installing Docker Desktop..."
+  brew install --cask docker
+  echo "⚠️ Open Docker.app after install to finish setup"
+else
+  echo "✅ Docker already installed"
+fi
+
+# --------------------------------------------------
+# 8. Supabase CLI
+# --------------------------------------------------
+if ! command -v supabase &>/dev/null; then
+  echo "⬇️ Installing Supabase CLI..."
+  brew install supabase/tap/supabase
+else
+  echo "✅ Supabase CLI installed"
+fi
+
+# --------------------------------------------------
+# 9. IDEs
 # --------------------------------------------------
 if [ ! -d "/Applications/iTerm.app" ]; then
-  echo "⬇️ Installing iTerm2..."
   brew install --cask iterm2
-else
-  echo "✅ iTerm2 already installed"
 fi
 
-# --------------------------------------------------
-# 8. Install Visual Studio Code
-# --------------------------------------------------
 if [ ! -d "/Applications/Visual Studio Code.app" ]; then
-  echo "⬇️ Installing Visual Studio Code..."
   brew install --cask visual-studio-code
-else
-  echo "✅ VSCode already installed"
 fi
 
 # --------------------------------------------------
-# 9. (Optional) Windsurf IDE — SKIPPED for security
+# 10. Git Configuration
 # --------------------------------------------------
-echo "⚠️ Windsurf install skipped (unverified source). Install manually if needed."
+if ! git config --global user.name &>/dev/null; then
+  echo "🔧 Setting up Git..."
+
+  read -p "Enter your Git name: " git_name
+  read -p "Enter your Git email: " git_email
+
+  git config --global user.name "$git_name"
+  git config --global user.email "$git_email"
+
+  git config --global init.defaultBranch main
+  git config --global pull.rebase false
+  git config --global core.editor "code --wait"
+
+  echo "✅ Git configured"
+else
+  echo "✅ Git already configured"
+fi
 
 # --------------------------------------------------
-# 10. Output tool versions
+# 11. Oh My Zsh
+# --------------------------------------------------
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+  echo "⬇️ Installing Oh My Zsh..."
+  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+else
+  echo "✅ Oh My Zsh installed"
+fi
+
+ZSH_CUSTOM=${ZSH_CUSTOM:-~/.oh-my-zsh/custom}
+
+# Plugins
+if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
+  git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions
+fi
+
+if [ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]; then
+  git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
+fi
+
+# --------------------------------------------------
+# 12. Firebase Check
+# --------------------------------------------------
+if command -v firebase &>/dev/null; then
+  echo "✅ Firebase CLI ready"
+fi
+
+# --------------------------------------------------
+# 13. Final Output
 # --------------------------------------------------
 echo ""
 echo "📦 Installed Versions:"
-echo "Node:     $(node -v)"
-echo "npm:      $(npm -v)"
-echo "mongod:   $(mongod --version | head -n 1)"
-echo "mongosh:  $(mongosh --version)"
-echo "Prettier: $(prettier --version)"
-echo "ESLint:   $(eslint -v)"
-echo "Nodemon:  $(nodemon -v)"
-echo "TSC:      $(tsc -v)"
-echo "Yarn:     $(yarn -v)"
-echo "VSCode:   Installed"
-echo "iTerm2:   Installed"
+echo "Node: $(node -v)"
+echo "npm: $(npm -v)"
+echo "mongod: $(mongod --version | head -n 1)"
+echo "mongosh: $(mongosh --version)"
+echo "Docker: Installed"
+echo "Firebase: $(firebase --version)"
+echo "Supabase: $(supabase --version)"
+echo "Git: $(git --version)"
 
 echo ""
-echo "🎉 Setup complete! Your workstation is locked, loaded, and ready to build something serious."
+echo "⚠️ FINAL STEPS:"
+echo "1. Open Docker.app"
+echo "2. Open VSCode → enable 'code' command"
+echo "3. Add to ~/.zshrc:"
+echo "   plugins=(git zsh-autosuggestions zsh-syntax-highlighting)"
+echo "4. Run: source ~/.zshrc"
+
+echo ""
+echo "🎉 Setup complete. System is ready."
