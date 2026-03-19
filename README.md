@@ -1,136 +1,169 @@
 # 💻 Workstation Setup for Developers
 
-This project provides a streamlined, standalone setup script (`setup.sh`) to automate the installation of essential tools and configurations for macOS-based full-stack JavaScript and Node.js development. It’s powered by [Bash](https://www.gnu.org/software/bash/) and leverages [Homebrew](https://brew.sh/) to install packages cleanly and efficiently — with added support for modern IDEs like **iTerm2**, **VSCode**, and **Windsurf**.
+This project provides a streamlined, standalone setup script (`setup.sh`) to automate the installation of essential tools and configurations for macOS-based full-stack JavaScript and Node.js development. It’s powered by [Bash](https://www.gnu.org/software/bash/) and leverages [Homebrew](https://brew.sh/) to install packages cleanly and efficiently — with added support for modern IDEs like **iTerm2** & **VSCode**.
+
+---
+
+A production-grade macOS developer bootstrap system designed to get you fully set up in one run.
+
+---
 
 ## 🎯 Purpose
 
-The goal of this script is to make spinning up a reliable and consistent dev environment quick — whether you're setting up a new Mac, rebuilding your workstation, or onboarding new devs to your team. This script handles the boring stuff so you can jump straight into building.
+This script creates a consistent and reliable development environment for:
 
-## 💡 Why This Format?
+* Engineers
+* Students
+* Teams
+* New machines
 
-* 🧠 **Simple & native**: No framework, no YAML — just pure bash
-* 📂 **One file, one command**: Easy to fork, reuse, and extend
-* 🧹 **Clean and lightweight**: Only installs what's commonly needed
-* 🧩 **Modular**: Customize it to fit your workflow
-* 👥 **Ideal for individuals and team leads**: Especially helpful when onboarding new engineers or students
+---
 
-## 🚫 What This Doesn’t Do
+## ⚙️ What Gets Installed
 
-This script stays lean on purpose:
+### 🧱 Core Stack
 
-* Doesn’t install every dev stack under the sun — focuses on JavaScript/Mongo
-* Doesn’t mess with dotfiles or personal terminal themes
-* Doesn’t assume your editor of choice — installs multiple IDEs, you pick your weapon
+* Homebrew
+* Node.js (LTS via NVM)
+* MongoDB (Community Edition)
+* mongosh
 
-## ⚙️ Prerequisites
+---
 
-Before running the setup, make sure:
+### 📦 Dev Tooling
 
-* You’re on an up-to-date version of **macOS**
-* You’ve installed the **Command Line Tools for Xcode** (required for Homebrew)
+* prettier
+* eslint
+* nodemon
+* typescript
+* yarn
+* firebase-tools
 
-Install with:
+---
 
-```bash
-xcode-select --install
+### 🐳 Infrastructure
+
+* Docker Desktop
+
+---
+
+### 🔥 Backend Tools
+
+* Firebase CLI
+* Supabase CLI
+
+---
+
+### 🛠 IDEs
+
+* iTerm2
+* Visual Studio Code
+
+---
+
+### ⚡ Shell Enhancements
+
+* Oh My Zsh
+* zsh-autosuggestions
+* zsh-syntax-highlighting
+
+---
+
+### 🔐 Git Setup
+
+* Name + Email
+* Default branch → main
+* VS Code as editor
+
+---
+
+## 🚫 What This Does NOT Do
+
+* Doesn’t install every language
+* Doesn’t override your dotfiles
+* Doesn’t force a workflow
+
+---
+
+## 📥 Installation
+
 ```
-
-## 📥 Cloning This Repo
-
-Open Terminal and run:
-
-```bash
 mkdir -p ~/workspace &&
 cd ~/workspace &&
 git clone https://github.com/LemonmadeDesigns/Lemons-Workstation-Setup.git &&
 cd Lemons-Workstation-Setup
 ```
 
-## 🧪 Running the Script
+---
 
-To install your full dev environment, run:
+## 🚀 Run Setup
 
-```bash
+```
 chmod +x setup.sh
 ./setup.sh
 ```
 
-This script will:
+---
 
-* Prompt for your Mac password once (via `sudo`)
-* Install Homebrew if missing
-* Install Node.js, MongoDB, `mongosh`, global CLI tools, and 3 IDEs
+## ⚠️ After Setup
 
-> **Note:** The script is completely standalone. No external configs or linked scripts are required.
+### 1. Open Docker
 
-## 🧰 What Gets Installed
+Docker must be launched manually the first time.
 
-### 🧱 Core Tooling
+---
 
-* **Node.js** (includes `npm` and `npx`)
-* **MongoDB Community Edition**
-* **mongosh** (MongoDB’s official shell)
+### 2. Enable VS Code CLI
 
-### 📦 Global npm packages
+Open VS Code → Cmd + Shift + P → Install "code" command in PATH
 
-* `prettier`
-* `eslint`
-* `nodemon`
-* `typescript`
-* `yarn`
+---
 
-### 🛠 Developer IDEs & Tools
+### 3. Enable Zsh Plugins
 
-* **iTerm2** – better terminal for power users
-* **Visual Studio Code** – the default full-stack editor
-* **Windsurf IDE** – installed via official GitHub release script
+Edit:
 
-> ✅ These are installed via Homebrew Casks and secure curl-based installers.
+```
+nano ~/.zshrc
+```
 
-### 🔄 Services
+Add:
 
-* MongoDB is installed and launched as a background service using `brew services`
+```
+plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
+```
 
-## 🧠 Tips & Gotchas
+Then run:
 
-* No need to run this with `sudo`. The script handles elevation as needed.
+```
+source ~/.zshrc
+```
 
-* If Homebrew throws a permissions error, run:
+---
 
-  ```bash
-  sudo chown -R $(whoami) /usr/local/var/homebrew
-  ```
+## 🔁 Re-Runnable
 
-* After installing VS Code, make sure to enable the command line tool:
+Safe to run multiple times.
+Skips installed tools and updates what’s needed.
 
-    > Launch VS Code → Press Cmd+Shift+P → Type: Shell Command → Click Install 'code' command in PATH
+---
 
 ## 🛠 Customization
 
-Want to add Docker, Python, or your favorite fonts?
+Extend as needed:
 
-1. Fork this repo
-2. Modify `setup.sh` — it’s well-commented and modular
-3. Use it for new machines, remote onboarding, or team training
+* Add Python / Go / Rust
+* Add AWS CLI / Terraform
+* Add fonts, themes, aliases
 
-## ❓ Frequently Asked Questions
-
-**Q: Can I run the script more than once?**
-**A:** Yes. It won’t reinstall what's already there. It’s safe to re-run.
-
-**Q: Can I modify it to install different stacks (like Python or Ruby)?**
-**A:** Absolutely. Just `brew install` or `npm install -g` anything else you need.
-
-**Q: Does it work on Linux or Windows?**
-**A:** Not as-is. This version is built specifically for macOS. A Linux version would need different package managers (`apt`, `dnf`, etc.).
+---
 
 ## ✍️ Author
 
-**Built by [Terrell D. Lemons](https://linkedin.com/in/terrelldlemons)**
-Software Engineer | Release Coordinator | Remote Instruction Manager
-[GitHub @terrelldlemons](https://github.com/LemonmadeDesigns/)
+Terrell D. Lemons
+
+---
 
 ## ⚖️ License
 
-Licensed under the MIT License.
-Use it. Fork it. Share it. Just don’t bloat it.
+MIT License
