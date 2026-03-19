@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
-# setup.sh: Full macOS Developer Environment Bootstrap
-# by Mr. Lemons (Production Ready)
+# setup.sh: Universal macOS Developer Environment Bootstrap (Configurable)
+# by Mr. Lemons
 #
 
 set -e
@@ -11,7 +11,25 @@ sudo -K
 sudo true
 clear
 
-echo "🚀 Starting full macOS developer setup..."
+echo "🚀 Starting macOS development environment setup..."
+
+# --------------------------------------------------
+# LOAD ENV CONFIG (OPTIONAL)
+# --------------------------------------------------
+# Supports team-level overrides via .env file
+if [ -f ".env" ]; then
+  echo "📦 Loading configuration from .env..."
+  export $(grep -v '^#' .env | xargs)
+fi
+
+# --------------------------------------------------
+# DEFAULT CONFIG (SAFE FALLBACKS)
+# --------------------------------------------------
+NODE_VERSION="${NODE_VERSION:-20}"
+INSTALL_DOCKER="${INSTALL_DOCKER:-true}"
+INSTALL_SUPABASE="${INSTALL_SUPABASE:-true}"
+INSTALL_FIREBASE="${INSTALL_FIREBASE:-true}"
+INSTALL_MONGODB="${INSTALL_MONGODB:-true}"
 
 # --------------------------------------------------
 # 0. Xcode Command Line Tools
@@ -19,33 +37,33 @@ echo "🚀 Starting full macOS developer setup..."
 if ! xcode-select -p &>/dev/null; then
   echo "⬇️ Installing Xcode Command Line Tools..."
   xcode-select --install
-  echo "⚠️ Complete installation, then re-run this script."
+  echo "⚠️ Complete installation, then re-run script."
   exit 1
 else
-  echo "✅ Xcode CLI Tools installed"
+  echo "✅ Xcode CLI Tools ready"
 fi
 
 # --------------------------------------------------
-# 1. Homebrew Installation
+# 1. Homebrew
 # --------------------------------------------------
 if ! command -v brew &>/dev/null; then
   echo "🍺 Installing Homebrew..."
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
-# Ensure brew works (Intel + Apple Silicon)
+# Load brew into environment (Intel + Apple Silicon)
 eval "$(/opt/homebrew/bin/brew shellenv 2>/dev/null || /usr/local/bin/brew shellenv)"
 
-echo "✅ Homebrew ready"
 brew update
+echo "✅ Homebrew ready"
 
 # --------------------------------------------------
-# 2. Install Core Packages
+# 2. Core Packages
 # --------------------------------------------------
 brew install git curl wget
 
 # --------------------------------------------------
-# 3. NVM + Node (LTS)
+# 3. NVM + Node (VERSION CONTROLLED)
 # --------------------------------------------------
 if [ ! -d "$HOME/.nvm" ]; then
   echo "⬇️ Installing NVM..."
@@ -56,153 +74,144 @@ fi
 export NVM_DIR="$HOME/.nvm"
 source "$(brew --prefix nvm)/nvm.sh"
 
-if ! command -v node &>/dev/null; then
-  echo "⬇️ Installing Node LTS..."
-  nvm install --lts
-  nvm use --lts
-else
-  echo "✅ Node installed: $(node -v)"
+echo "⬇️ Installing Node version: $NODE_VERSION"
+nvm install $NODE_VERSION
+nvm use $NODE_VERSION
+nvm alias default $NODE_VERSION
+
+# Persist NVM in shell
+if ! grep -q 'NVM_DIR' ~/.zshrc; then
+  echo 'export NVM_DIR="$HOME/.nvm"' >> ~/.zshrc
+  echo '[ -s "$(brew --prefix nvm)/nvm.sh" ] && \. "$(brew --prefix nvm)/nvm.sh"' >> ~/.zshrc
 fi
 
 # --------------------------------------------------
-# 4. MongoDB
+# 4. MongoDB (Optional)
 # --------------------------------------------------
-if ! command -v mongod &>/dev/null; then
-  echo "⬇️ Installing MongoDB..."
-  brew tap mongodb/brew
-  brew install mongodb-community@7.0
-  brew services start mongodb/brew/mongodb-community@7.0
-else
-  echo "✅ MongoDB already installed"
+if [ "$INSTALL_MONGODB" = true ]; then
+  if ! command -v mongod &>/dev/null; then
+    echo "⬇️ Installing MongoDB..."
+    brew tap mongodb/brew
+    brew install mongodb-community@7.0
+    brew services start mongodb/brew/mongodb-community@7.0
+  else
+    echo "✅ MongoDB already installed"
+  fi
 fi
 
 # --------------------------------------------------
 # 5. mongosh
 # --------------------------------------------------
-if ! command -v mongosh &>/dev/null; then
-  echo "⬇️ Installing mongosh..."
-  brew install mongosh
+if [ "$INSTALL_MONGODB" = true ]; then
+  if ! command -v mongosh &>/dev/null; then
+    brew install mongosh
+  fi
 fi
 
 # --------------------------------------------------
-# 6. Global npm tools (safe path)
+# 6. Global npm Tools (SAFE PATH)
 # --------------------------------------------------
-echo "⬇️ Installing global npm tools..."
-
 mkdir -p ~/.npm-global
 npm config set prefix "${HOME}/.npm-global"
+
+if ! grep -q '.npm-global/bin' ~/.zshrc; then
+  echo 'export PATH="$HOME/.npm-global/bin:$PATH"' >> ~/.zshrc
+fi
+
 export PATH="$HOME/.npm-global/bin:$PATH"
 
-npm install -g \
-  prettier \
-  eslint \
-  nodemon \
-  typescript \
-  yarn \
-  firebase-tools
+echo "⬇️ Installing global dev tools..."
+npm install -g prettier eslint nodemon typescript yarn
 
-# --------------------------------------------------
-# 7. Docker
-# --------------------------------------------------
-if [ ! -d "/Applications/Docker.app" ]; then
-  echo "⬇️ Installing Docker Desktop..."
-  brew install --cask docker
-  echo "⚠️ Open Docker.app after install to finish setup"
-else
-  echo "✅ Docker already installed"
+if [ "$INSTALL_FIREBASE" = true ]; then
+  npm install -g firebase-tools
 fi
 
 # --------------------------------------------------
-# 8. Supabase CLI
+# 7. Docker (Optional but Recommended)
 # --------------------------------------------------
-if ! command -v supabase &>/dev/null; then
-  echo "⬇️ Installing Supabase CLI..."
-  brew install supabase/tap/supabase
-else
-  echo "✅ Supabase CLI installed"
+if [ "$INSTALL_DOCKER" = true ]; then
+  if [ ! -d "/Applications/Docker.app" ]; then
+    echo "⬇️ Installing Docker Desktop..."
+    brew install --cask docker
+    echo "⚠️ Open Docker.app after install"
+  else
+    echo "✅ Docker already installed"
+  fi
+fi
+
+# --------------------------------------------------
+# 8. Supabase CLI (Optional)
+# --------------------------------------------------
+if [ "$INSTALL_SUPABASE" = true ]; then
+  if ! command -v supabase &>/dev/null; then
+    brew install supabase/tap/supabase
+  else
+    echo "✅ Supabase CLI installed"
+  fi
 fi
 
 # --------------------------------------------------
 # 9. IDEs
 # --------------------------------------------------
-if [ ! -d "/Applications/iTerm.app" ]; then
-  brew install --cask iterm2
-fi
-
-if [ ! -d "/Applications/Visual Studio Code.app" ]; then
-  brew install --cask visual-studio-code
-fi
+[ -d "/Applications/iTerm.app" ] || brew install --cask iterm2
+[ -d "/Applications/Visual Studio Code.app" ] || brew install --cask visual-studio-code
 
 # --------------------------------------------------
-# 10. Git Configuration
+# 10. Git (RESPECT EXISTING CONFIG)
 # --------------------------------------------------
 if ! git config --global user.name &>/dev/null; then
-  echo "🔧 Setting up Git..."
-
-  read -p "Enter your Git name: " git_name
-  read -p "Enter your Git email: " git_email
-
-  git config --global user.name "$git_name"
-  git config --global user.email "$git_email"
-
+  echo "🔧 Git not configured. Applying defaults..."
   git config --global init.defaultBranch main
   git config --global pull.rebase false
   git config --global core.editor "code --wait"
 
-  echo "✅ Git configured"
+  echo "⚠️ Set your Git identity:"
+  echo "git config --global user.name \"Your Name\""
+  echo "git config --global user.email \"your@email.com\""
 else
   echo "✅ Git already configured"
 fi
 
 # --------------------------------------------------
-# 11. Oh My Zsh
+# 11. Zsh + Plugins
 # --------------------------------------------------
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
   echo "⬇️ Installing Oh My Zsh..."
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-else
-  echo "✅ Oh My Zsh installed"
 fi
 
 ZSH_CUSTOM=${ZSH_CUSTOM:-~/.oh-my-zsh/custom}
 
-# Plugins
-if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
+[ -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ] || \
   git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions
-fi
 
-if [ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]; then
+[ -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ] || \
   git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
+
+# Enforce plugins
+if ! grep -q "zsh-autosuggestions" ~/.zshrc; then
+  sed -i '' 's/plugins=(git)/plugins=(git zsh-autosuggestions zsh-syntax-highlighting)/' ~/.zshrc
 fi
 
 # --------------------------------------------------
-# 12. Firebase Check
-# --------------------------------------------------
-if command -v firebase &>/dev/null; then
-  echo "✅ Firebase CLI ready"
-fi
-
-# --------------------------------------------------
-# 13. Final Output
+# 12. Final Output
 # --------------------------------------------------
 echo ""
-echo "📦 Installed Versions:"
+echo "📦 Environment Summary:"
 echo "Node: $(node -v)"
 echo "npm: $(npm -v)"
-echo "mongod: $(mongod --version | head -n 1)"
-echo "mongosh: $(mongosh --version)"
-echo "Docker: Installed"
-echo "Firebase: $(firebase --version)"
-echo "Supabase: $(supabase --version)"
+[ "$INSTALL_MONGODB" = true ] && echo "MongoDB: $(mongod --version | head -n 1)"
+[ "$INSTALL_DOCKER" = true ] && echo "Docker: Installed"
+[ "$INSTALL_FIREBASE" = true ] && echo "Firebase: $(firebase --version)"
+[ "$INSTALL_SUPABASE" = true ] && echo "Supabase: $(supabase --version)"
 echo "Git: $(git --version)"
 
 echo ""
 echo "⚠️ FINAL STEPS:"
-echo "1. Open Docker.app"
-echo "2. Open VSCode → enable 'code' command"
-echo "3. Add to ~/.zshrc:"
-echo "   plugins=(git zsh-autosuggestions zsh-syntax-highlighting)"
-echo "4. Run: source ~/.zshrc"
+echo "1. Open Docker (if installed)"
+echo "2. Enable VS Code CLI (Cmd+Shift+P → 'code')"
+echo "3. Restart terminal or run: source ~/.zshrc"
 
 echo ""
-echo "🎉 Setup complete. System is ready."
+echo "🎉 Setup complete."
