@@ -1,10 +1,4 @@
-Mr. Lemons — here’s your **final README.md**, clean, aligned with the script, and with emojis that actually add clarity instead of noise.
-
-You can drop this straight into GitHub.
-
----
-
-# 💻 Lemon’s Workstation Setup
+# 💻 Professional Development Workstation Setup
 
 🚀 A production-grade macOS developer bootstrap script that gets your environment fully set up in one run.
 
